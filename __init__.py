@@ -63,10 +63,37 @@ def slide_right(grid: List) -> bool:
 
                 # Shift cells to the right
                 c = column_no
-                while c > 0 :
+                while c > 0:
                     row[c] = row[c - 1]
                     c -= 1
                 row[0] = 0
+            else:
+                has_merged = False
+
+    return changed
+
+
+def slide_left(grid: List) -> bool:
+    changed = False
+    has_merged = False
+    for row in grid:
+        for column_no in range(len(row) - 1, 0, -1):
+            if row[column_no] and not row[column_no - 1]:
+                row[column_no - 1] = row[column_no]
+                row[column_no] = 0
+                changed = True
+            elif row[column_no] and not has_merged and row[column_no] == row[column_no - 1]:
+                # Merge
+                row[column_no - 1] = row[column_no] * 2
+                changed = True
+                has_merged = True
+
+                # Shift cells to the left
+                c = column_no
+                while c < len(row) - 1:
+                    row[c] = row[c + 1]
+                    c += 1
+                row[3] = 0
             else:
                 has_merged = False
 
