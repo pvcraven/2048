@@ -4,6 +4,7 @@ from __init__ import score_grid
 from __init__ import spawn_number
 from __init__ import slide_right
 from __init__ import slide_left
+from __init__ import slide_down
 
 
 def test_creation():
@@ -160,3 +161,88 @@ def test_slide_left():
     changed = slide_left(grid)
     assert changed
     assert grid[0] == [16, 4, 0, 0]
+
+
+def test_slide_up():
+    # Create our board and make sure it starts with zero score
+    size = 4
+    grid = create_board(size)
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [2, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [4, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [2, 0, 0, 0],
+                    [4, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [4, 0, 0, 0],
+                    [4, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [2, 0, 0, 0],
+                    [8, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [4, 0, 0, 0],
+                    [8, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [2, 0, 0, 0],
+                    [4, 0, 0, 0],
+                    [8, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [4, 0, 0, 0],
+                    [4, 0, 0, 0],
+                    [8, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [2, 0, 0, 0],
+                    [8, 0, 0, 0],
+                    [8, 0, 0, 0]]
+
+    grid[0][0] = 2
+    changed = slide_down(grid)
+    assert changed
+    assert grid == [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [4, 0, 0, 0],
+                    [16, 0, 0, 0]]

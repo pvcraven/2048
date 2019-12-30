@@ -93,7 +93,34 @@ def slide_left(grid: List) -> bool:
                 while c < len(row) - 1:
                     row[c] = row[c + 1]
                     c += 1
-                row[3] = 0
+                row[len(grid) - 1] = 0
+            else:
+                has_merged = False
+
+    return changed
+
+
+def slide_down(grid: List) -> bool:
+    changed = False
+    has_merged = False
+    for column_no in range(len(grid)):
+        for row_no in range(1, len(grid)):
+            if grid[row_no - 1][column_no] and not grid[row_no][column_no]:
+                grid[row_no][column_no] = grid[row_no - 1][column_no]
+                grid[row_no - 1][column_no] = 0
+                changed = True
+            elif grid[row_no][column_no] and not has_merged and grid[row_no][column_no] == grid[row_no - 1][column_no]:
+                # Merge
+                grid[row_no][column_no] = grid[row_no][column_no] * 2
+                changed = True
+                has_merged = True
+
+                # Shift cells down
+                r = row_no - 1
+                while r > 0:
+                    grid[r][column_no] = grid[r - 1][column_no]
+                    r -= 1
+                grid[0][column_no] = 0
             else:
                 has_merged = False
 
