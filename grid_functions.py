@@ -152,4 +152,3 @@ def slide_up(grid: List) -> bool:
                 has_merged = False
 
     return changed
-

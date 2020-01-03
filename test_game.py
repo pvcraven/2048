@@ -256,6 +256,7 @@ def test_slide_down():
                     [4, 0, 0, 0],
                     [16, 0, 0, 0]]
 
+
 def test_slide_up():
     # Create our board and make sure it starts with zero score
     size = 4
@@ -339,4 +340,3 @@ def test_slide_up():
                     [4, 0, 0, 0],
                     [0, 0, 0, 0],
                     [0, 0, 0, 0]]
-

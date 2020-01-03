@@ -8,7 +8,6 @@ from grid_functions import print_grid
 from grid_functions import BOARD_SIZE
 
 import PIL
-
 import math
 import arcade
 import random
@@ -17,6 +16,7 @@ SQUARE_COLOR = (73, 109, 137)
 SQUARE_SIZE = (150, 150)
 MARGIN = 10
 TEXT_SIZE = 30
+
 
 def create_textures():
     texture_list = []
@@ -61,7 +61,6 @@ def create_grid_sprites():
 
             my_sprite_grid.append(my_sprite)
 
-
     return my_sprite_grid
 
 
@@ -71,11 +70,12 @@ def update_grid_textures(grid, sprite_list, texture_list):
             if grid[row_no][column_no] == 0:
                 index = 0
             else:
-                index =  int(math.log2(grid[row_no][column_no]))
+                index = int(math.log2(grid[row_no][column_no]))
 
             loc = row_no * len(grid) + column_no
             # print(f"{row_no} {column_no} => {loc} = {grid[row_no][column_no]}")
             sprite_list[loc].texture = texture_list[index]
+
 
 class MyGame(arcade.Window):
 
@@ -84,7 +84,7 @@ class MyGame(arcade.Window):
 
         arcade.set_background_color(arcade.csscolor.CORAL)
         self.my_grid_sprites = create_grid_sprites()
-        self.my_textures =  create_textures()
+        self.my_textures = create_textures()
         self.my_grid = create_grid(BOARD_SIZE)
 
         self.spawn()
@@ -93,7 +93,6 @@ class MyGame(arcade.Window):
         print_grid(self.my_grid)
 
         update_grid_textures(self.my_grid, self.my_grid_sprites, self.my_textures)
-
 
     def spawn(self):
         if random.random() <= 0.1:
@@ -125,10 +124,8 @@ class MyGame(arcade.Window):
             update_grid_textures(self.my_grid, self.my_grid_sprites, self.my_textures)
 
 
-
 def main():
-    grid = create_grid(BOARD_SIZE)
-    my_window = MyGame()
+    MyGame()
 
     arcade.run()
 
