@@ -1,143 +1,136 @@
+from grid_functions import create_grid
+from grid_functions import spawn_number
+from grid_functions import slide_down
+from grid_functions import slide_left
+from grid_functions import slide_right
+from grid_functions import slide_up
+from grid_functions import print_grid
+from grid_functions import BOARD_SIZE
+
+import PIL
+
+import math
+import arcade
 import random
 
-from typing import List
+SQUARE_COLOR = (73, 109, 137)
+SQUARE_SIZE = (150, 150)
+MARGIN = 10
+TEXT_SIZE = 30
 
-BOARD_SIZE = 4
+def create_textures():
+    texture_list = []
 
+    width = SQUARE_SIZE[0]
+    height = SQUARE_SIZE[1]
 
-def create_board(size: int) -> List:
-    if size < 1:
-        raise ValueError("Grid size must be positive.")
+    img = PIL.Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
+    texture = arcade.Texture("0", img)
+    texture_list.append(texture)
 
-    grid = [[0 for _ in range(size)] for _ in range(size)]
-    return grid
+    i = 2
+    while i <= 2048:
+        img = PIL.Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
+        d = PIL.ImageDraw.Draw(img)
+        font = PIL.ImageFont.truetype("arial.ttf", TEXT_SIZE)
+        text = f"{i}"
+        text_w, text_h = d.textsize(text, font)
+        x = width - width / 2 - text_w / 2
+        y = height - height / 2 - text_h / 2
+        d.text((x, y), text, fill=(255, 255, 0), font=font)
+        texture = arcade.Texture(f"{i}", img)
+        texture_list.append(texture)
+        i *= 2
 
-
-def spawn_number(grid: List, number: int) -> bool:
-    # Find empty locations
-    possible_locations = []
-    for row in range(len(grid)):
-        for column in range(len(grid[0])):
-            if grid[row][column] == 0:
-                location = column, row
-                possible_locations.append(location)
-
-    if len(possible_locations) == 0:
-        return False
-
-    selected_location = random.choice(possible_locations)
-    column, row = selected_location
-    grid[row][column] = number
-    return True
-
-
-def print_grid(grid: List):
-    for row in grid:
-        for cell in row:
-            print(f"{cell:5}", end="")
-        print()
-    print()
+    return texture_list
 
 
-def score_grid(grid: List) -> int:
-    total = 0
-    for row in grid:
-        total += sum(row)
-    return total
+def create_grid_sprites():
+
+    my_sprite_grid = arcade.SpriteList()
+    width = SQUARE_SIZE[0]
+    height = SQUARE_SIZE[1]
+
+    for row in range(BOARD_SIZE):
+        for column in range(BOARD_SIZE):
+
+            my_sprite = arcade.Sprite()
+
+            my_sprite.center_x = column * (width + MARGIN) + width / 2 + MARGIN
+            my_sprite.center_y = (BOARD_SIZE - row) * (height + MARGIN) + height / 2 - MARGIN
+
+            my_sprite_grid.append(my_sprite)
 
 
-def slide_right(grid: List) -> bool:
-    changed = False
-    has_merged = False
-    for row in grid:
-        for column_no in range(0, len(row) - 1):
-            if row[column_no] and not row[column_no + 1]:
-                row[column_no + 1] = row[column_no]
-                row[column_no] = 0
-                changed = True
-            elif row[column_no] and not has_merged and row[column_no] == row[column_no + 1]:
-                # Merge
-                row[column_no + 1] = row[column_no] * 2
-                changed = True
-                has_merged = True
+    return my_sprite_grid
 
-                # Shift cells to the right
-                c = column_no
-                while c > 0:
-                    row[c] = row[c - 1]
-                    c -= 1
-                row[0] = 0
+
+def update_grid_textures(grid, sprite_list, texture_list):
+    for row_no in range(len(grid)):
+        for column_no in range(len(grid[0])):
+            if grid[row_no][column_no] == 0:
+                index = 0
             else:
-                has_merged = False
+                index =  int(math.log2(grid[row_no][column_no]))
 
-    return changed
+            loc = row_no * len(grid) + column_no
+            # print(f"{row_no} {column_no} => {loc} = {grid[row_no][column_no]}")
+            sprite_list[loc].texture = texture_list[index]
 
+class MyGame(arcade.Window):
 
-def slide_left(grid: List) -> bool:
-    changed = False
-    has_merged = False
-    for row in grid:
-        for column_no in range(len(row) - 1, 0, -1):
-            if row[column_no] and not row[column_no - 1]:
-                row[column_no - 1] = row[column_no]
-                row[column_no] = 0
-                changed = True
-            elif row[column_no] and not has_merged and row[column_no] == row[column_no - 1]:
-                # Merge
-                row[column_no - 1] = row[column_no] * 2
-                changed = True
-                has_merged = True
+    def __init__(self):
+        super().__init__(800, 800, "2048")
 
-                # Shift cells to the left
-                c = column_no
-                while c < len(row) - 1:
-                    row[c] = row[c + 1]
-                    c += 1
-                row[len(grid) - 1] = 0
-            else:
-                has_merged = False
+        arcade.set_background_color(arcade.csscolor.CORAL)
+        self.my_grid_sprites = create_grid_sprites()
+        self.my_textures =  create_textures()
+        self.my_grid = create_grid(BOARD_SIZE)
 
-    return changed
+        self.spawn()
+        # self.my_grid[0][0] = 2
+        # self.my_grid[1][0] = 4
+        print_grid(self.my_grid)
+
+        update_grid_textures(self.my_grid, self.my_grid_sprites, self.my_textures)
 
 
-def slide_down(grid: List) -> bool:
-    changed = False
-    has_merged = False
-    for column_no in range(len(grid)):
-        for row_no in range(1, len(grid)):
-            if grid[row_no - 1][column_no] and not grid[row_no][column_no]:
-                grid[row_no][column_no] = grid[row_no - 1][column_no]
-                grid[row_no - 1][column_no] = 0
-                changed = True
-            elif grid[row_no][column_no] and not has_merged and grid[row_no][column_no] == grid[row_no - 1][column_no]:
-                # Merge
-                grid[row_no][column_no] = grid[row_no][column_no] * 2
-                changed = True
-                has_merged = True
+    def spawn(self):
+        if random.random() <= 0.1:
+            number = 4
+        else:
+            number = 2
+        spawn_number(self.my_grid, number)
 
-                # Shift cells down
-                r = row_no - 1
-                while r > 0:
-                    grid[r][column_no] = grid[r - 1][column_no]
-                    r -= 1
-                grid[0][column_no] = 0
-            else:
-                has_merged = False
+    def on_draw(self):
+        try:
+            arcade.start_render()
+            self.my_grid_sprites.draw()
+        except Exception as e:
+            print(f"Exception: {e}")
 
-    return changed
+    def on_key_press(self, symbol: int, modifiers: int):
+        success = False
+        if symbol == arcade.key.LEFT:
+            success = slide_left(self.my_grid)
+        elif symbol == arcade.key.RIGHT:
+            success = slide_right(self.my_grid)
+        elif symbol == arcade.key.UP:
+            success = slide_up(self.my_grid)
+        elif symbol == arcade.key.DOWN:
+            success = slide_down(self.my_grid)
+
+        if success:
+            self.spawn()
+            update_grid_textures(self.my_grid, self.my_grid_sprites, self.my_textures)
+
 
 
 def main():
-    grid = create_board(BOARD_SIZE)
+    grid = create_grid(BOARD_SIZE)
+    my_window = MyGame()
 
-    for i in range(10):
-        print("Spawn")
-        spawn_number(grid, 2)
-        print_grid(grid)
-
-        print("Slide")
-        slide_right(grid)
-        print_grid(grid)
+    arcade.run()
 
 
 if __name__ == "__main__":
