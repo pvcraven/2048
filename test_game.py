@@ -112,6 +112,14 @@ def test_slide_right():
     assert changed
     assert grid[0] == [0, 0, 4, 8]
 
+    grid = [[0, 8, 4, 4],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]]
+    changed = slide_right(grid)
+    assert changed
+    assert grid[0] == [0, 0, 8, 8]
+
 
 def test_slide_left():
     # Create our board and make sure it starts with zero score
@@ -340,3 +348,14 @@ def test_slide_up():
                     [4, 0, 0, 0],
                     [0, 0, 0, 0],
                     [0, 0, 0, 0]]
+
+    grid = [[0, 0, 0, 2],
+            [2, 0, 2, 4],
+            [0, 0, 4, 16],
+            [0, 0, 8, 2]]
+    changed = slide_up(grid)
+    assert changed
+    assert grid == [[2, 0, 2, 2],
+                    [0, 0, 4, 4],
+                    [0, 0, 8, 16],
+                    [0, 0, 0, 2]]

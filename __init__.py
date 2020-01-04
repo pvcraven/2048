@@ -7,7 +7,10 @@ from grid_functions import slide_up
 from grid_functions import print_grid
 from grid_functions import BOARD_SIZE
 
-import PIL
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+
 import math
 import arcade
 import random
@@ -24,15 +27,15 @@ def create_textures():
     width = SQUARE_SIZE[0]
     height = SQUARE_SIZE[1]
 
-    img = PIL.Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
+    img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
     texture = arcade.Texture("0", img)
     texture_list.append(texture)
 
     i = 2
     while i <= 2048:
-        img = PIL.Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
-        d = PIL.ImageDraw.Draw(img)
-        font = PIL.ImageFont.truetype("arial.ttf", TEXT_SIZE)
+        img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
+        d = ImageDraw.Draw(img)
+        font = ImageFont.truetype("arial.ttf", TEXT_SIZE)
         text = f"{i}"
         text_w, text_h = d.textsize(text, font)
         x = width - width / 2 - text_w / 2
@@ -109,19 +112,27 @@ class MyGame(arcade.Window):
             print(f"Exception: {e}")
 
     def on_key_press(self, symbol: int, modifiers: int):
-        success = False
-        if symbol == arcade.key.LEFT:
-            success = slide_left(self.my_grid)
-        elif symbol == arcade.key.RIGHT:
-            success = slide_right(self.my_grid)
-        elif symbol == arcade.key.UP:
-            success = slide_up(self.my_grid)
-        elif symbol == arcade.key.DOWN:
-            success = slide_down(self.my_grid)
+        try:
+            success = False
+            if symbol == arcade.key.LEFT:
+                success = slide_left(self.my_grid)
+            elif symbol == arcade.key.RIGHT:
+                success = slide_right(self.my_grid)
+            elif symbol == arcade.key.UP:
+                success = slide_up(self.my_grid)
+            elif symbol == arcade.key.DOWN:
+                success = slide_down(self.my_grid)
 
-        if success:
-            self.spawn()
-            update_grid_textures(self.my_grid, self.my_grid_sprites, self.my_textures)
+            if success:
+                print("\nSLIDE")
+                print_grid(self.my_grid)
+                print("\nSPAWN")
+                self.spawn()
+                print_grid(self.my_grid)
+
+                update_grid_textures(self.my_grid, self.my_grid_sprites, self.my_textures)
+        except Exception as e:
+            print(e)
 
 
 def main():

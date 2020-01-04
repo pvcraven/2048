@@ -46,109 +46,157 @@ def score_grid(grid: List) -> int:
     return total
 
 
-def slide_right(grid: List) -> bool:
+def compress_right(grid: List) -> bool:
     changed = False
-    has_merged = False
-    for row in grid:
-        for column_no in range(0, len(row) - 1):
-            if row[column_no] and not row[column_no + 1]:
-                row[column_no + 1] = row[column_no]
-                row[column_no] = 0
-                changed = True
-            elif row[column_no] and not has_merged and row[column_no] == row[column_no + 1]:
-                # Merge
-                row[column_no + 1] = row[column_no] * 2
-                changed = True
-                has_merged = True
-
-                # Shift cells to the right
-                c = column_no
-                while c > 0:
-                    row[c] = row[c - 1]
-                    c -= 1
-                row[0] = 0
+    for row_no in range(len(grid)):
+        cur_col = len(grid) - 1
+        for i in range(len(grid)):
+            if grid[row_no][cur_col] != 0:
+                # No zero, look further left
+                cur_col -= 1
             else:
-                has_merged = False
+                # Found a zero, shift cells to the right
+                c = cur_col
+                while c > 0:
+                    grid[row_no][c] = grid[row_no][c - 1]
+                    if grid[row_no][c]:
+                        changed = True
+                    c -= 1
+                grid[row_no][0] = 0
+    return changed
 
+
+def merge_right(grid: List) -> bool:
+    changed = False
+    for row_no in range(len(grid)):
+        for col_no in range(len(grid) - 1, 0, -1):
+            if grid[row_no][col_no] != 0 and grid[row_no][col_no] == grid[row_no][col_no - 1]:
+                grid[row_no][col_no] *= 2
+                grid[row_no][col_no - 1] = 0
+                changed = True
+    return changed
+
+
+def slide_right(grid: List) -> bool:
+    c1 = compress_right(grid)
+    c2 = merge_right(grid)
+    c3 = compress_right(grid)
+
+    return c1 or c2 or c3
+
+
+def compress_left(grid: List) -> bool:
+    changed = False
+    for row_no in range(len(grid)):
+        cur_col = 0
+        for i in range(len(grid)):
+            if grid[row_no][cur_col] != 0:
+                # No zero, look further left
+                cur_col += 1
+            else:
+                # Found a zero, shift cells to the right
+                c = cur_col
+                while c < len(grid) - 1:
+                    grid[row_no][c] = grid[row_no][c + 1]
+                    if grid[row_no][c]:
+                        changed = True
+                    c += 1
+                grid[row_no][-1] = 0
+    return changed
+
+
+def merge_left(grid: List) -> bool:
+    changed = False
+    for row_no in range(len(grid)):
+        for col_no in range(len(grid) - 1):
+            if grid[row_no][col_no] != 0 and grid[row_no][col_no] == grid[row_no][col_no + 1]:
+                grid[row_no][col_no] *= 2
+                grid[row_no][col_no + 1] = 0
+                changed = True
     return changed
 
 
 def slide_left(grid: List) -> bool:
+    c1 = compress_left(grid)
+    c2 = merge_left(grid)
+    c3 = compress_left(grid)
+
+    return c1 or c2 or c3
+
+
+def compress_down(grid: List) -> bool:
     changed = False
-    has_merged = False
-    for row in grid:
-        for column_no in range(len(row) - 1, 0, -1):
-            if row[column_no] and not row[column_no - 1]:
-                row[column_no - 1] = row[column_no]
-                row[column_no] = 0
-                changed = True
-            elif row[column_no] and not has_merged and row[column_no] == row[column_no - 1]:
-                # Merge
-                row[column_no - 1] = row[column_no] * 2
-                changed = True
-                has_merged = True
-
-                # Shift cells to the left
-                c = column_no
-                while c < len(row) - 1:
-                    row[c] = row[c + 1]
-                    c += 1
-                row[len(grid) - 1] = 0
+    for col_no in range(len(grid[0])):
+        row_no = len(grid[0]) - 1
+        for i in range(len(grid)):
+            if grid[row_no][col_no] != 0:
+                # No zero, look further left
+                row_no -= 1
             else:
-                has_merged = False
+                # Found a zero, shift cells to the right
+                r = row_no
+                while r > 0:
+                    grid[r][col_no] = grid[r - 1][col_no]
+                    if grid[r][col_no]:
+                        changed = True
+                    r -= 1
+                grid[0][col_no] = 0
+    return changed
 
+
+def merge_down(grid: List) -> bool:
+    changed = False
+    for col_no in range(len(grid)):
+        for row_no in range(len(grid) - 1, 0, -1):
+            if grid[row_no][col_no] != 0 and grid[row_no][col_no] == grid[row_no - 1][col_no]:
+                grid[row_no][col_no] *= 2
+                grid[row_no - 1][col_no] = 0
+                changed = True
     return changed
 
 
 def slide_down(grid: List) -> bool:
+    c1 = compress_down(grid)
+    c2 = merge_down(grid)
+    c3 = compress_down(grid)
+
+    return c1 or c2 or c3
+
+
+def compress_up(grid: List) -> bool:
     changed = False
-    has_merged = False
-    for column_no in range(len(grid)):
-        for row_no in range(1, len(grid)):
-            if grid[row_no - 1][column_no] and not grid[row_no][column_no]:
-                grid[row_no][column_no] = grid[row_no - 1][column_no]
-                grid[row_no - 1][column_no] = 0
-                changed = True
-            elif grid[row_no][column_no] and not has_merged and grid[row_no][column_no] == grid[row_no - 1][column_no]:
-                # Merge
-                grid[row_no][column_no] = grid[row_no][column_no] * 2
-                changed = True
-                has_merged = True
-
-                # Shift cells down
-                r = row_no - 1
-                while r > 0:
-                    grid[r][column_no] = grid[r - 1][column_no]
-                    r -= 1
-                grid[0][column_no] = 0
+    for col_no in range(len(grid[0])):
+        row_no = 0
+        for i in range(len(grid)):
+            if grid[row_no][col_no] != 0:
+                # No zero, look further
+                row_no += 1
             else:
-                has_merged = False
+                # Found a zero, shift cells
+                r = row_no
+                while r < len(grid) - 1:
+                    grid[r][col_no] = grid[r + 1][col_no]
+                    if grid[r][col_no]:
+                        changed = True
+                    r += 1
+                grid[-1][col_no] = 0
+    return changed
 
+
+def merge_up(grid: List) -> bool:
+    changed = False
+    for col_no in range(len(grid)):
+        for row_no in range(0, len(grid) - 1):
+            if grid[row_no][col_no] != 0 and grid[row_no][col_no] == grid[row_no + 1][col_no]:
+                grid[row_no][col_no] *= 2
+                grid[row_no + 1][col_no] = 0
+                changed = True
     return changed
 
 
 def slide_up(grid: List) -> bool:
-    changed = False
-    has_merged = False
-    for column_no in range(len(grid)):
-        for row_no in range(len(grid) - 1, 0, -1):
-            if grid[row_no][column_no] and not grid[row_no - 1][column_no]:
-                grid[row_no - 1][column_no] = grid[row_no][column_no]
-                grid[row_no][column_no] = 0
-                changed = True
-            elif grid[row_no][column_no] and not has_merged and grid[row_no][column_no] == grid[row_no - 1][column_no]:
-                # Merge
-                grid[row_no][column_no] = grid[row_no][column_no] * 2
-                changed = True
-                has_merged = True
+    c1 = compress_up(grid)
+    c2 = merge_up(grid)
+    c3 = compress_up(grid)
 
-                # Shift cells down
-                r = row_no
-                while r < len(grid):
-                    grid[r - 1][column_no] = grid[r][column_no]
-                    r += 1
-                grid[-1][column_no] = 0
-            else:
-                has_merged = False
-
-    return changed
+    return c1 or c2 or c3
