@@ -15,10 +15,27 @@ import math
 import arcade
 import random
 
-SQUARE_COLOR = (73, 109, 137)
+BACKGROUND_COLOR = 119, 110, 101
+EMPTY_CELL = 205, 193, 180
+TEXT_COLOR_DARK = 119, 110, 101
+TEXT_COLOR_LIGHT = 249, 246, 242
+SQUARE_COLORS = (205, 193, 180), \
+                (238, 228, 218), \
+                (237, 224, 200), \
+                (242, 177, 121), \
+                (245, 149, 99), \
+                (246, 124, 95), \
+                (246, 94, 59), \
+                (237, 207, 114), \
+                (237, 204, 97), \
+                (237, 200, 80), \
+                (237, 197, 63), \
+                (237, 194, 46), \
+                (62, 57, 51)
+
 SQUARE_SIZE = (150, 150)
 MARGIN = 10
-TEXT_SIZE = 30
+TEXT_SIZE = 50
 
 
 def create_textures():
@@ -27,23 +44,29 @@ def create_textures():
     width = SQUARE_SIZE[0]
     height = SQUARE_SIZE[1]
 
-    img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
+    img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLORS[0])
     texture = arcade.Texture("0", img)
     texture_list.append(texture)
 
     i = 2
+    i2 = 1
     while i <= 2048:
-        img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLOR)
+        img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLORS[i2])
         d = ImageDraw.Draw(img)
         font = ImageFont.truetype("arial.ttf", TEXT_SIZE)
         text = f"{i}"
         text_w, text_h = d.textsize(text, font)
         x = width - width / 2 - text_w / 2
         y = height - height / 2 - text_h / 2
-        d.text((x, y), text, fill=(255, 255, 0), font=font)
+        if i <= 8:
+            color = TEXT_COLOR_DARK
+        else:
+            color = TEXT_COLOR_LIGHT
+        d.text((x, y), text, fill=color, font=font)
         texture = arcade.Texture(f"{i}", img)
         texture_list.append(texture)
         i *= 2
+        i2 += 1
 
     return texture_list
 
@@ -85,7 +108,7 @@ class MyGame(arcade.Window):
     def __init__(self):
         super().__init__(800, 800, "2048")
 
-        arcade.set_background_color(arcade.csscolor.CORAL)
+        arcade.set_background_color(BACKGROUND_COLOR)
         self.my_grid_sprites = create_grid_sprites()
         self.my_textures = create_textures()
         self.my_grid = create_grid(BOARD_SIZE)
