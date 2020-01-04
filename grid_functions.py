@@ -2,8 +2,6 @@ import random
 
 from typing import List
 
-BOARD_SIZE = 4
-
 
 def create_grid(size: int) -> List:
     if size < 1:

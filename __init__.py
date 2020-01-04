@@ -5,7 +5,6 @@ from grid_functions import slide_left
 from grid_functions import slide_right
 from grid_functions import slide_up
 from grid_functions import print_grid
-from grid_functions import BOARD_SIZE
 
 from PIL import Image
 from PIL import ImageDraw
@@ -33,25 +32,28 @@ SQUARE_COLORS = (205, 193, 180), \
                 (237, 194, 46), \
                 (62, 57, 51)
 
-SQUARE_SIZE = (150, 150)
+SQUARE_SIZE = 150
 MARGIN = 10
 TEXT_SIZE = 50
+BOARD_SIZE = 4
+WINDOW_WIDTH = BOARD_SIZE * (SQUARE_SIZE + MARGIN) + MARGIN
+WINDOW_HEIGHT = BOARD_SIZE * (SQUARE_SIZE + MARGIN) + MARGIN
 
 
 def create_textures():
     texture_list = []
 
-    width = SQUARE_SIZE[0]
-    height = SQUARE_SIZE[1]
+    width = SQUARE_SIZE
+    height = SQUARE_SIZE
 
-    img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLORS[0])
+    img = Image.new('RGB', (SQUARE_SIZE, SQUARE_SIZE), color=SQUARE_COLORS[0])
     texture = arcade.Texture("0", img)
     texture_list.append(texture)
 
     i = 2
     i2 = 1
     while i <= 2048:
-        img = Image.new('RGB', SQUARE_SIZE, color=SQUARE_COLORS[i2])
+        img = Image.new('RGB', (SQUARE_SIZE, SQUARE_SIZE), color=SQUARE_COLORS[i2])
         d = ImageDraw.Draw(img)
         font = ImageFont.truetype("arial.ttf", TEXT_SIZE)
         text = f"{i}"
@@ -74,8 +76,8 @@ def create_textures():
 def create_grid_sprites():
 
     my_sprite_grid = arcade.SpriteList()
-    width = SQUARE_SIZE[0]
-    height = SQUARE_SIZE[1]
+    width = SQUARE_SIZE
+    height = SQUARE_SIZE
 
     for row in range(BOARD_SIZE):
         for column in range(BOARD_SIZE):
@@ -83,7 +85,7 @@ def create_grid_sprites():
             my_sprite = arcade.Sprite()
 
             my_sprite.center_x = column * (width + MARGIN) + width / 2 + MARGIN
-            my_sprite.center_y = (BOARD_SIZE - row) * (height + MARGIN) + height / 2 - MARGIN
+            my_sprite.center_y = (BOARD_SIZE - row - 1) * (height + MARGIN) + height / 2 + MARGIN
 
             my_sprite_grid.append(my_sprite)
 
@@ -106,7 +108,7 @@ def update_grid_textures(grid, sprite_list, texture_list):
 class MyGame(arcade.Window):
 
     def __init__(self):
-        super().__init__(800, 800, "2048")
+        super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, "2048")
 
         arcade.set_background_color(BACKGROUND_COLOR)
         self.my_grid_sprites = create_grid_sprites()
