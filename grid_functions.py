@@ -1,3 +1,7 @@
+"""
+Grid functions for 2048 clone
+"""
+
 import random
 
 from typing import List
